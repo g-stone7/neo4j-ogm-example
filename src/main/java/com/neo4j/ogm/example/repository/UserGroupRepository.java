@@ -4,6 +4,7 @@ import com.neo4j.ogm.example.domain.UserGroup;
 import org.neo4j.ogm.model.Result;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Repository
@@ -21,6 +22,19 @@ public class UserGroupRepository extends BaseRepository<UserGroup> {
 		Result result = session.query(query, queryParams, false);
 		return result.queryResults().iterator().hasNext()
 				? (UserGroup) result.queryResults().iterator().next().get("userGroup")
+				: null;
+	}
+
+	public String[] getUserGroupNames() {
+		final String query = "MATCH (userGroup:UserGroup)\n" +
+				"CALL { " +
+				"   WITH userGroup" +
+				"   RETURN userGroup.name as userGroupName" +
+				"}" +
+				"RETURN collect(userGroupName) as result";
+		Result result = session.query(query, new HashMap<>(), true);
+		return result.queryResults().iterator().hasNext()
+				? (String[]) result.queryResults().iterator().next().get("result")
 				: null;
 	}
 
